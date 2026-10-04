@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Public } from './decorators/public.decorator';
 import type { AuthenticatedRequest } from './types/authenticated-request.type';
-
-import { AuthGuard } from '@nestjs/passport';
 
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -11,17 +10,18 @@ import { LoginDto } from './dto/login.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
+  @Public()
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get('me')
   getCurrentUser(@Req() req: AuthenticatedRequest) {
     return req.user;
