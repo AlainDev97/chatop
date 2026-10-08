@@ -1,6 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { MessagesService } from './messages.service';
-import { CreateMessageDto } from './dto/create-message.dto';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -8,6 +6,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { MessagesService } from './messages.service';
+import { CreateMessageDto } from './dto/create-message.dto';
+import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type';
 
 @ApiTags('Messages')
 @ApiBearerAuth()
@@ -34,25 +36,12 @@ export class MessagesController {
   @ApiResponse({
     status: 400,
     description: 'Erreur de validation',
-    schema: {
-      example: {
-        message: 'Validation error',
-        error: 'Bad Request',
-        statusCode: 400,
-      },
-    },
   })
   @ApiResponse({
     status: 401,
     description: 'Token absent ou invalide',
-    schema: {
-      example: {
-        message: 'Unauthorized',
-        statusCode: 401,
-      },
-    },
   })
-  create(@Body() dto: CreateMessageDto) {
-    return this.messagesService.create(dto);
+  create(@Body() dto: CreateMessageDto, @Req() req: AuthenticatedRequest) {
+    return this.messagesService.create(dto, req.user.id);
   }
 }

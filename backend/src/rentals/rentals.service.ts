@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { RentalsRepository } from './rentals.repository';
 import { UpdateRentalDto } from './dto/update-rental.dto';
 import type { CreateRentalDto } from './dto/create-rental.dto';
@@ -74,11 +78,20 @@ export class RentalsService {
     };
   }
 
-  async update(id: number, dto: UpdateRentalDto, file?: Express.Multer.File) {
+  async update(
+    id: number,
+    dto: UpdateRentalDto,
+    authenticatedUserId: number,
+    file?: Express.Multer.File,
+  ) {
     const rental = await this.rentalsRepository.findById(id);
 
     if (!rental) {
       throw new NotFoundException('Rental not found');
+    }
+
+    if (rental.owner_id !== authenticatedUserId) {
+      throw new ForbiddenException('You are not allowed to update this rental');
     }
 
     const data: {

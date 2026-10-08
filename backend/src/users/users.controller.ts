@@ -1,5 +1,14 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  ParseIntPipe,
+  Req,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
+import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type';
+
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -16,13 +25,13 @@ export class UsersController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Récupérer un utilisateur par son ID',
+    summary: 'Récupérer ses propres informations utilisateur',
   })
   @ApiParam({
     name: 'id',
     type: Number,
     example: 1,
-    description: 'Identifiant de l’utilisateur',
+    description: 'Identifiant de l’utilisateur connecté',
   })
   @ApiResponse({
     status: 200,
@@ -48,6 +57,17 @@ export class UsersController {
     },
   })
   @ApiResponse({
+    status: 403,
+    description: 'Accès aux informations d’un autre utilisateur interdit',
+    schema: {
+      example: {
+        message: 'You are not allowed to access this user',
+        error: 'Forbidden',
+        statusCode: 403,
+      },
+    },
+  })
+  @ApiResponse({
     status: 404,
     description: 'Utilisateur introuvable',
     schema: {
@@ -58,7 +78,14 @@ export class UsersController {
       },
     },
   })
-  findById(@Param('id', ParseIntPipe) id: number) {
+  findById(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    if (req.user.id !== id) {
+      throw new ForbiddenException('You are not allowed to access this user');
+    }
+
     return this.usersService.findById(id);
   }
 }

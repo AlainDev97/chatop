@@ -6,11 +6,11 @@ import { CreateMessageDto } from './dto/create-message.dto';
 export class MessagesService {
   constructor(private readonly messagesRepository: MessagesRepository) {}
 
-  async create(dto: CreateMessageDto) {
+  async create(dto: CreateMessageDto, authenticatedUserId: number) {
     try {
       await this.messagesRepository.create({
         rentalId: dto.rental_id,
-        userId: dto.user_id,
+        userId: authenticatedUserId,
         message: dto.message,
       });
 

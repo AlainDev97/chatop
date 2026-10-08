@@ -243,6 +243,18 @@ export class RentalsController {
     },
   })
   @ApiResponse({
+    status: 403,
+    description:
+      'Modification interdite : la location appartient à un autre utilisateur',
+    schema: {
+      example: {
+        message: 'You are not allowed to update this rental',
+        error: 'Forbidden',
+        statusCode: 403,
+      },
+    },
+  })
+  @ApiResponse({
     status: 404,
     description: 'Location introuvable',
     schema: {
@@ -270,8 +282,9 @@ export class RentalsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateRentalDto,
+    @Req() req: AuthenticatedRequest,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.rentalsService.update(id, dto, file);
+    return this.rentalsService.update(id, dto, req.user.id, file);
   }
 }
