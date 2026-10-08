@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RentalsRepository } from './rentals.repository';
+import { UpdateRentalDto } from './dto/update-rental.dto';
 import type { CreateRentalDto } from './dto/create-rental.dto';
 
 @Injectable()
@@ -70,6 +71,48 @@ export class RentalsService {
 
     return {
       message: 'Rental created!',
+    };
+  }
+
+  async update(id: number, dto: UpdateRentalDto, file?: Express.Multer.File) {
+    const rental = await this.rentalsRepository.findById(id);
+
+    if (!rental) {
+      throw new NotFoundException('Rental not found');
+    }
+
+    const data: {
+      name?: string;
+      surface?: number;
+      price?: number;
+      picture?: string;
+      description?: string;
+    } = {};
+
+    if (dto.name !== undefined) {
+      data.name = dto.name;
+    }
+
+    if (dto.surface !== undefined) {
+      data.surface = dto.surface;
+    }
+
+    if (dto.price !== undefined) {
+      data.price = dto.price;
+    }
+
+    if (dto.description !== undefined) {
+      data.description = dto.description;
+    }
+
+    if (file) {
+      data.picture = `http://localhost:3001/uploads/${file.filename}`;
+    }
+
+    await this.rentalsRepository.update(id, data);
+
+    return {
+      message: 'Rental updated!',
     };
   }
 }

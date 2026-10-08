@@ -54,4 +54,20 @@ export class RentalsRepository {
       },
     });
   }
+
+  update(
+    id: number,
+    data: {
+      name?: string;
+      surface?: number;
+      price?: number;
+      picture?: string;
+      description?: string;
+    },
+  ) {
+    return this.prisma.rentals.update({
+      where: { id },
+      data,
+    });
+  }
 }
