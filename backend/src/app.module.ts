@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RentalsModule } from './rentals/rentals.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RentalsModule } from './rentals/rentals.module';
     UsersModule,
     AuthModule,
     RentalsModule,
+    MessagesModule,
   ],
   providers: [
     {
